@@ -14,6 +14,7 @@ struct ContentView: View {
     @State private var showingScore = false
     @State private var scoreTitle = ""
     @State public var score = 0
+    @State private var gameOver = false
     
     var body: some View {
         
@@ -70,21 +71,44 @@ struct ContentView: View {
         } message: {
             Text("Your score is \(score)")
         }
+        .alert(scoreTitle, isPresented: $gameOver) {
+            Button("Play Again?", action: reset)
+        } message: {
+            Text("You won!")
+        }
+        
     }
+    
     func flagTapped(_ number: Int) {
         if number == correctAnswer {
             scoreTitle = "Correct"
             score += 1
         } else {
-            scoreTitle = "Wrong"
+            scoreTitle = "Wrong - the answer was \(countries[correctAnswer])!"
+            score -= 1
         }
         
         showingScore = true
     }
+    
     func askQuestion() {
         countries.shuffle()
         correctAnswer = Int.random(in: 0...2)
+        if score == 8 {
+            endGame()
+        }
     }
+    
+    func endGame() {
+        scoreTitle = "You won!"
+        gameOver = true
+    }
+    
+    func reset() {
+        score = 0
+        askQuestion()
+    }
+    
 }
 
 struct ContentView_Previews: PreviewProvider {
